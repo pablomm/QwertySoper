@@ -1,3 +1,13 @@
+/**
+* @brief Modulo con el main del ejercicio 9
+*
+* @file ejercicio9.c
+* @author David Nevado Catalan <david.nevadoc@estudiante.uam.es>
+* @author Pablo Marcos Manchon <pablo.marcosm@estudiante.uam.es>
+* @version 1.0
+* @date 23-02-2016
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
