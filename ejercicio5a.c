@@ -1,10 +1,10 @@
 /**
-* @brief Modulo del apartado a) del ejercicio 4 
+* @brief Modulo del apartado a) del ejercicio 5 
 *
 * Contiene un programa que lanza varios hijos y en cada fork()
 * el proceso hijo imprime en la salida estandar su pid y el de
 * su padre
-* @file ejercicio4a.c
+* @file ejercicio5a.c
 * @author Pablo Marcos Manchon <pablo.marcosm@estudiante.uam.es>
 * @author David Nevado Catalan <david.nevadoc@estudiante.uam.es>
 * @version 1.0
@@ -26,10 +26,10 @@ int main (void) {
             exit(EXIT_FAILURE);
 
         } else if (pid ==0) {
-            printf("HIJO %d\n", i);
+            printf ("PADRE %d\n", getppid());
+            printf("HIJO %d\n", getpid());
    
         }else{
-            printf ("PADRE %d\n", i);
             /* Se hace un wait para esperar  al proceso hijo */
             wait();
             break;

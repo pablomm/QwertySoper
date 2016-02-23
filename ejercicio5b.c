@@ -1,7 +1,7 @@
 /**
 * @brief Modulo del apartado b) del ejercicio 5 
 *
-* Contiene un programa que lanza varios hijos y 
+* Contiene un programa que lanza varios hijos  
 * esperando hasta que termine la ejecucion de todos ellos
 * @file ejercicio5b.c
 * @author Pablo Marcos Manchon <pablo.marcosm@estudiante.uam.es>
@@ -25,11 +25,11 @@ int main (void){
             exit(EXIT_FAILURE);
 
         } else if (pid ==0) { /* Rama de ejecucion del hijo */
-            printf("HIJO %d\n", i);
+            printf ("PADRE %d\n", getppid());
+            printf("HIJO %d\n", getpid());
             break;
 
         }else{ /* Rama de ejecucion del padre */
-            printf ("PADRE %d\n", i);
             wait();
         }
     }
