@@ -1,0 +1,9 @@
+Explicacion del ejercicio 5 en sucio
+
+Ejercicio 5.
+a) 
+Para que el conjunto de procesos se genere de forma secuencial, basta con introducir la llamada a la función wait() dentro de la rama de ejecución del padre, de esta manera cuando se realiza un fork() el proceso padre se bloquea hasta que finaliza la ejecución del proceso hijo, el cual continua dentro del bucle generando otros procesos de forma secuencial.
+Como cada proceso solo debe generar un único hijo, en la rama del padre, después de la llamada a wait() hace un break para salir del bucle y no seguir generando otros procesos.
+De esta forma se generara una secuencia de procesos de longitud NUM_PROC, definida como 3.
+b)
+Para que el proceso padre lance varios hijos y espere a todos ellos basta con añadir un break en la rama de los procesos hijos al realizar un fork(), para que salgan del bucle y no sigan generando procesos, y en la rama del padre hacer una llamada a la función wait() para que espere a los procesos lanzados.

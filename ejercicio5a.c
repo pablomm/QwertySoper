@@ -1,9 +1,8 @@
 /**
 * @brief Modulo del apartado a) del ejercicio 5 
 *
-* Contiene un programa que lanza varios hijos y en cada fork()
-* el proceso hijo imprime en la salida estandar su pid y el de
-* su padre
+* Se genera secuencialmente una serie de procesos
+* que imprimen su pid y el de su padre
 * @file ejercicio5a.c
 * @author Pablo Marcos Manchon <pablo.marcosm@estudiante.uam.es>
 * @author David Nevado Catalan <david.nevadoc@estudiante.uam.es>

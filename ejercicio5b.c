@@ -3,6 +3,7 @@
 *
 * Contiene un programa que lanza varios hijos  
 * esperando hasta que termine la ejecucion de todos ellos
+* Cada hijo imprime su pid y el de su padre
 * @file ejercicio5b.c
 * @author Pablo Marcos Manchon <pablo.marcosm@estudiante.uam.es>
 * @author David Nevado Catalan <david.nevadoc@estudiante.uam.es>
