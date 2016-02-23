@@ -1,5 +1,11 @@
 /**
-* @brief Modulo con el main del ejercicio 9
+* @brief Ejercicio 9.
+* Contiene un programa que lanza 2 hijos, estos lanzan a 
+* a su vez 2 hijos mas. Despues mediante tuberias, el padre envia
+* un mensaje a sus nietos. Estos lo imprimen por pantalla junto
+* con el PID del proceso por donde lo recibieron y mandan una 
+* respuesta. Estas respuestas son recibidas por el padre, que las
+* imprime por pantalla junto con el PID del nieto que las mando.
 *
 * @file ejercicio9.c
 * @author David Nevado Catalan <david.nevadoc@estudiante.uam.es>
@@ -12,10 +18,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#define TAM 200
+#define TAM 150
+
+/**
+* @brief main del programa del ejercicio 9
+* @return EXIT_SUCCESS si fue todo bien o EXIT_FAILURE en caso contrario
+*/
 void main(void){
     int i=0;
-    int j=0; 
+    int j=0;
+    int status=0; 
     /*Las tuberias con cuyo segundo indice es 
         0 comunican datos de padres a hijos (se llamaran de bajada)
         1 comunican datos de hijos a padres (se llamaran de subida)*/ 
@@ -42,7 +54,7 @@ el contendio recibido por las tuberias de su padre (los hijos) */
     char respuestas1[2][TAM];/*Variables que utilizaran los primeros hijos para
 almacenar el contenido recibido por las tuberias de sus hijos (los nietos)*/
     char respuestas2[2][TAM];/*Variables que utilizara el padre para  almacenar 
-el contenido recibido por las tuberias de sus hijos (loshijos)*/
+el contenido recibido por las tuberias de sus hijos (los hijos)*/
 
     /*Mensaje que se envia desde el padre hacia los nietos*/
     char mensaje[] = "Datos enviados a traves de la tuberia";    
@@ -72,7 +84,6 @@ el contenido recibido por las tuberias de sus hijos (loshijos)*/
         exit(EXIT_FAILURE);
     }
 
-
     childpid1=fork();
     /*Control de error de la creacion del proceso hijo 1*/
     if(childpid1==-1){
@@ -80,20 +91,16 @@ el contenido recibido por las tuberias de sus hijos (loshijos)*/
         exit(EXIT_FAILURE);
     }
         
-
     if(childpid1>0){
-        /*El proceso padre abre un nuevo proceso*/        
-        
+        /*El proceso padre abre un nuevo proceso*/           
         /*Control de error de la creacion del proceso hijo 2*/
         childpid2=fork();
         if(childpid2==-1){
             perror("Error al crear proceso hijo 2\n");
             exit(EXIT_FAILURE);
         }
-
         /*Linea de ejercucion del proceso padre*/
-        if(childpid2>0){
-                
+        if(childpid2>0){              
             /*El proceso padre cierra la entrada de las tuberias 1.0 y 2.0*/
             close(fd1[0][0]);
             close(fd2[0][0]);
@@ -107,23 +114,19 @@ el contenido recibido por las tuberias de sus hijos (loshijos)*/
             read(fd1[1][0],respuestas2[0],TAM);
             read(fd2[1][0],respuestas2[1],TAM);
             /*El proceso padre imprime las respuestas*/
-            printf("PADRE: %s%s", respuestas2[0],respuestas2[1]);
-            
+            printf("PADRE: %s%s", respuestas2[0],respuestas2[1]);       
             /*El proceso padre espera a que sus dos hijos terminen*/            
-            wait();
-            wait();
+            wait(&status);
+            wait(&status);
             /*Fin del programa*/
             exit(EXIT_SUCCESS);
-        }
-            
+        }        
     }
-
     /*Linea de ejecucion de los procesos hijos */
-
     /*Hijo 1*/
     if (childpid1==0){
         /*Cierra las tuberias 2.0 y 2.1, y la salida de la tuberia 1.0 y la 
-entrada de 1.1*/
+          entrada de 1.1*/
         for(i=0;i<2;i++){
             for(j=0;j<2;j++){
             close(fd2[i][j]);            
@@ -137,7 +140,7 @@ entrada de 1.1*/
     /*Hijo 2*/
     else if (childpid2==0){
         /*Cierra las tuberias 1.0 y 1.1, y la salida de la tuberia 2.0 y la
-entrada de 2.1*/
+          entrada de 2.1*/
         for(i=0;i<2;i++){
             for(j=0;j<2;j++){
             close(fd1[i][j]);            
@@ -145,7 +148,6 @@ entrada de 2.1*/
         }
         close(fd2[0][1]);
         close(fd2[1][0]);
-
         /*Lee el contenido enviado por la tuberia 2*/
         read(fd2[0][0], buf, TAM );
     }
@@ -171,17 +173,14 @@ entrada de 2.1*/
     if(pipe(fd4[1])==-1){
         perror("Error al crear la tuberia 4.1\n");
         exit(EXIT_FAILURE);
-    }    
-
+    }   
     /*Ambos procesos lanzaran ahora 2 hijos mas*/
-    
     /*Control de error de la creacion del proceso hijo 3*/
     childpid3=fork();
     if(childpid3==-1){
         perror("Error al crear proceso hijo 3\n");
         exit(EXIT_FAILURE);
-    }
-        
+    }       
     if(childpid3>0){    
         /*Control de error de la creacion del proceso hijo 4*/
         childpid4=fork();
@@ -211,15 +210,13 @@ entrada de 2.1*/
             write(fd2[1][1], buf, strlen(buf)+1);
             }
             /*Espera a que sus hijos terminen*/
-            wait();
-            wait();
+            wait(&status);
+            wait(&status);
             /*Termina su ejecucion*/
             exit(EXIT_SUCCESS);
         }   
-        
     }
      /*Linea de ejecucion de los procesos hijos (segundos) */
-
     /*Hijo 3*/
     if (childpid3==0){
         /*Cierra las tuberias 4.0 y 4.1, y la salida de la tuberia 3.0 y la
@@ -231,7 +228,6 @@ entrada de 3.1*/
         }
         close(fd3[0][1]);
         close(fd3[1][0]);
-
         /*Lee el contenido enviado por la tuberia 3*/
         read(fd3[0][0], buf2, TAM );
         /*Imprime el mensaje leido*/
@@ -253,7 +249,6 @@ entrada de 4.1*/
         }
         close(fd4[0][1]);
         close(fd4[1][0]);
-
         /*Lee el contenido enviado por la tuberia 2*/
         read(fd4[0][0], buf2, TAM );    
         /*Imprime el mensaje leido*/
@@ -264,6 +259,4 @@ entrada de 4.1*/
         /*Termina su ejecucion*/
         exit(EXIT_SUCCESS);   
     }
-
-    
 }
