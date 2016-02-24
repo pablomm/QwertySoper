@@ -14,10 +14,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h> 
 
 /**
 * @brief main del programa del ejercicio 8a
-* @return no devuelve nada en caso de exito y EXIT_FAILURE en caso contrario
+* @return devuelve EXIT_FAILURE en caso de fallo
 */
 void main(void){
     printf("A continuacion se  muestra tamano de este ejecutable:\n");
