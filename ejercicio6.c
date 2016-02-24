@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define TAM 20
+#define TAM 30
 
 /**
 * @brief main del programa del ejercicio 6
@@ -45,8 +45,8 @@ int main(void){
 	/*Linea de ejecucion del proceso hijo*/
     else if(f==0) {
         /*Solcitud de entrada al usuario */
-        fprintf(stdout, "\n Introduzca un mensaje corto: ");
-        fscanf(stdin,"%s", buf);
+        fprintf(stdout, "\nPADRE: Introduzca un mensaje corto: ");
+        fgets(buf,TAM, stdin);
         free(buf);	
     }
 
@@ -55,9 +55,9 @@ int main(void){
         /*Salida por pantalla del contenido de buf*/
         /*Si el string esta vacio, mostramos un mensaje informando*/
         if(buf[0]==0){
-            printf("No hay ningun mensaje.\n");
+            printf("HIJO: No hay ningun mensaje.\n");
         }else {
-            printf("Mensaje que tiene el padre: %s\n", buf);
+            printf("HIJO: Mensaje que tiene el padre: %s\n", buf);
         }
         free(buf);
         wait(&status);
