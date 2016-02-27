@@ -14,6 +14,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 #define TAM 30
 
@@ -28,7 +31,7 @@ int main(void){
     pid_t f=-1;
 	/*Reserva de memoria para 20 caracteres*/
     buf=malloc(TAM* sizeof(char));
-    /*Control de la reserva de memoria*/	
+    /*Control de la reserva de memoria*/
     if(buf==NULL){
         perror("Error en la reserva de memoria\n");
         exit(EXIT_FAILURE);
@@ -47,7 +50,7 @@ int main(void){
         /*Solcitud de entrada al usuario */
         fprintf(stdout, "\nPADRE: Introduzca un mensaje corto: ");
         fgets(buf,TAM, stdin);
-        free(buf);	
+        free(buf);
     }
 
 	/*Linea de ejecucion del proceso padre*/

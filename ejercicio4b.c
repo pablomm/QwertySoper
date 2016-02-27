@@ -1,5 +1,5 @@
 /**
-* @brief Modulo del apartado b) del ejercicio 4 
+* @brief Modulo del apartado b) del ejercicio 4
 *
 * Contiene un programa que lanza varios hijos y en cada fork()
 * el proceso hijo imprime en la salida estandar su pid y el de
@@ -13,11 +13,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define NUM_PROC 3
 
 /**
-* @brief main del programa del ejercicio 4a
+* @brief main del programa del ejercicio 4b
 * @return EXIT_SUCCESS si fue todo bien o EXIT_FAILURE en caso contrario
 */
 
@@ -35,6 +37,6 @@ int main (void){
             printf ("PADRE %d\n", getppid());
         }
     }
-    wait();
+    wait(NULL);
     exit(EXIT_SUCCESS);
 }

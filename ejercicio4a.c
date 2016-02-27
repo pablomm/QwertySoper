@@ -1,5 +1,5 @@
 /**
-* @brief Modulo del apartado a) del ejercicio 4 
+* @brief Modulo del apartado a) del ejercicio 4
 *
 * Contiene un programa que lanza varios hijos y en cada fork()
 * el proceso hijo imprime en la salida estandar su pid y el de
@@ -13,6 +13,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define NUM_PROC 3
 
@@ -29,7 +31,7 @@ int main (void){
         if ((pid=fork()) <0 ){
             printf("Error al emplear fork\n");
             exit(EXIT_FAILURE);
-        
+
         } else if (pid ==0) { /* Rama de ejecucion del hijo */
             printf("HIJO  %d\n",getpid());
             printf ("PADRE %d \n",getppid());

@@ -1,7 +1,7 @@
 /**
-* @brief Modulo del apartado b) del ejercicio 5 
+* @brief Modulo del apartado b) del ejercicio 5
 *
-* Contiene un programa que lanza varios hijos  
+* Contiene un programa que lanza varios hijos
 * esperando hasta que termine la ejecucion de todos ellos
 * Cada hijo imprime su pid y el de su padre
 * @file ejercicio5b.c
@@ -13,9 +13,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define NUM_PROC 3
 
+/**
+* @brief main del programa del ejercicio 4b
+* @return EXIT_SUCCESS si fue todo bien o EXIT_FAILURE en caso contrario
+*/
 int main (void){
     int pid;
     int i;
@@ -31,7 +37,7 @@ int main (void){
             break;
 
         }else{ /* Rama de ejecucion del padre */
-            wait();
+            wait(NULL);
         }
     }
     exit(EXIT_SUCCESS);

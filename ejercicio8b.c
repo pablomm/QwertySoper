@@ -15,7 +15,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h> 
+#include <unistd.h>
+#include <sys/wait.h>
+#include <string.h>
 
 #define TAM 40
 
@@ -24,18 +26,17 @@
 * @brief main del programa del ejercicio 8b
 * @return Devuelve EXIT_FAILURE en caso de fallo, y EXIT_SUCCESS si se ejecuta
 * el comando en segundo plano y termina con exito.
-* Los parametros que se introduzcan son ignorados.s
+* Los parametros junto al comando que se introduzcan son ignorados.
 */
-void main(void){
+int main(void){
     char comando[TAM];
     int plano=0; /*Controlara el bucle que asegura una entrada correcta*/
     int pid=-1;
-	int status=0;
 
     /*Entrada del comando*/
     printf("Introduzca el comando: ");
     fgets(comando,TAM,stdin);
-	
+
 	/* Sustituimos el \n y los espacios almacenados por un \0 */
 	strtok(comando," \n");
 
@@ -49,15 +50,17 @@ void main(void){
             execlp(comando,comando, NULL);
 
         } else if(plano ==2){ /* Caso Background */
-			if(pid=fork() < 0){ /* Error en el fork() */
+			if((pid=fork()) < 0){ /* Error en el fork() */
 				perror("Error al realizar el fork()");
 				exit(EXIT_FAILURE);
 
-			} else if (pid==0){ /* Rama de ejecucion del hijo */ 
+			} else if (pid==0){ /* Rama de ejecucion del hijo */
+                setsid();
 				execlp(comando,comando, NULL);
+                
 
 			} else { /* Rama de ejecucion del padre */
-				wait(&status);
+				/* wait(NULL); */
 				exit(EXIT_SUCCESS);
 			}
 
