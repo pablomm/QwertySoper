@@ -1,6 +1,6 @@
 CC = gcc -pedantic
 CFLAGS = -Wall
-EXE = ejercicio3a ejercicio3b ejercicio4 ejercicio6 ejercicio8 ejercicio10-fallido
+EXE = ejercicio3a ejercicio3b ejercicio4 ejercicio6 ejercicio8 ejercicio10
 LIBS = -lm -lrt -lpthread
 
 all : $(EXE)
