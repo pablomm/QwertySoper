@@ -28,7 +28,7 @@
 /**
 * @brief Tiempo de espera en segundos entre lecturas (y entre escrituras)
 */
-#define T_ESPERA 2
+#define T_ESPERA 1
 
 /**
 * @brief Funcion encargada de la captura de SIGUSR1
@@ -64,7 +64,7 @@ int main(void){
     char buffer[MAX];
 
 
-  /*Mascara para esperar a la alarma*/
+  /*Mascara para esperar a la alarma y a la sennal SIGUSR1*/
     if(sigfillset(&mask)==-1){
         perror("Error en la mascara");
         exit(EXIT_FAILURE);
@@ -76,18 +76,18 @@ int main(void){
     if(sigdelset(&mask,SIGUSR1)==-1){
         perror("Error en la mascara");
         exit(EXIT_FAILURE);
-    }      
+    }        
+ 
     /*Armamos un manejador para la alarma*/
     if(signal(SIGALRM, manejador_SIGALRM)==SIG_ERR){
         perror("Error al armar el manejador");
         exit(EXIT_FAILURE);
     }
-    /*Armamos el manejador de la senna de usuario1*/
+    /*Armamos el manejador de SIGUSR1*/
     if(signal(SIGUSR1, manejador_SIGUSR1)==SIG_ERR){
         perror("Error al armar el manejador");
         exit(EXIT_FAILURE);
     }
-
 
     /*Bucle principal del programa*/
     for (i=0;i<NITER;){    
@@ -100,30 +100,22 @@ int main(void){
 
 	    /*Linea de ejecucion del padre*/
         if(childpid>0){
-             /*Introducimos un pequenno desfase */
-             if(alarm(T_ESPERA/2)){
-                    perror("Ya habia una alarma creada");
-                    exit(EXIT_FAILURE);
-                }
+            /*Esperamos hasta que se reciba la sennal del hijo para abrir el fichero */
             sigsuspend(&mask);
 
-
             flag=0;
-            for(;i<NITER && flag == 0;i++){
-                /*Esperamos a que se reciba la sennal del proceso hijo*/
-                sigsuspend(&mask);
-                pfile=fopen(fichero, "r");
-                if(pfile==NULL){
-                    perror("No se pudo abrir el fichero");
-                    exit(EXIT_FAILURE);
+            pfile=fopen(fichero, "r");
+               if(pfile==NULL){
+                   perror("No se pudo abrir el fichero");
+                   exit(EXIT_FAILURE);
                 }
+            for(;i<NITER && flag == 0;i++){
+               
                 fgets(buffer, MAX, pfile);
-                printf("He leido la palabra %s\n", buffer);
-                fflush(NULL);
-                fclose(pfile);
-                /*Enviamos sennal al hijo*/
-                kill(childpid,SIGUSR1);
-                if(strcmp("FIN ", buffer)==0){
+                printf("He leido la palabra %s", buffer);
+                strtok(buffer, "\n");
+                if(strcmp("FIN", buffer)==0){
+                    fclose(pfile);
                     if(wait(NULL)==EXIT_FAILURE){
                         exit(EXIT_FAILURE);
                     }
@@ -148,35 +140,29 @@ int main(void){
             printf("Lanzamiento de un hijo con pid: %d\n", getpid());
 
             /*Seed*/
-		    srand(getpid() + time(NULL)); 
+		    srand(getpid() + time(NULL));
+            
+            pfile=fopen(fichero, "w+");
+            if(pfile==NULL){
+                perror("No se pudo abrir el fichero");
+                exit(EXIT_FAILURE);
+            } 
             /*Bucle principal*/
             while(1){
                    
-                pfile=fopen(fichero, "w+");
-                if(pfile==NULL){
-                    perror("No se pudo abrir el fichero");
-                    exit(EXIT_FAILURE);
-                }
+                
                 strcpy(palabra,cadena[rand()%12]);
-                fprintf(pfile,"%s ", palabra);
+                fprintf(pfile,"%s\n", palabra);
                 printf("Soy hijo, y he escrito la palabra %s\n", palabra);
-                fclose(pfile);
-                kill(getppid(), SIGUSR1);
+
+                
                 if(strcmp("FIN", palabra)==0){
+                    fclose(pfile);
+                    kill(getppid(),SIGUSR1);
                     printf("Soy el hijo, y me acabo\n");
                     exit(EXIT_SUCCESS);
                     
                 }
-
-                /*Se genera una alarma cada 5 segundos*/
-                if(alarm(T_ESPERA)){
-                    perror("Ya habia una alarma creada");
-                    exit(EXIT_FAILURE);
-                }
-                /*Esperamos hasta que se reciba la alarma*/
-                sigsuspend(&mask);
-                /*Esperamos a que se reciba la sennal del proceso hijo*/
-                sigsuspend(&mask);
 
             } 
 	    }
@@ -198,14 +184,14 @@ void manejador_SIGALRM(sig){
     }
 }
 void manejador_SIGUSR1(sig){
-    printf("He recibido el control del fichero - ");    
-
+    
     if(signal(SIGUSR1, manejador_SIGUSR1)==SIG_ERR){
         perror("Error al armar el manejador");
         exit(EXIT_FAILURE);
     }
-
 }
+
+
 
 
 
