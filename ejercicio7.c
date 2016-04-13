@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/wait.h>
+#include <pthread.h>
 #include "semaforos.h"
 
 #define NUM_COCHES 100
@@ -27,9 +27,19 @@
 #define SEMKEY 75798
 
 /**
- * @brief key para generar la memoria compartida
- */
-#define SHMKEY 70234
+* @brief Estructura con datos para la funcion
+* multiplicador utilizada por los hilos
+*/
+typedef struct _datos{
+    /** Contador de coches */
+    int *contador; 
+    /** direccion del coche */
+    int direccion;
+    /** Identificador del semaforo */
+    int semid; 
+    /** Numero de hilo */
+    int numCoche;
+} datos;
 
 /**
  * Funcion cruzar puente, se encarga de que el coche espere
@@ -38,7 +48,7 @@
  * @file semaforos.c
  * @date 11/04/2016
  */
-int cruzarPuente(int direccion,int nCoche, int semid, int *contador);
+void *cruzarPuente(datos *d);
 
 /**
  * Funcion encargada de aumentar el contador del puente, y si
@@ -47,7 +57,7 @@ int cruzarPuente(int direccion,int nCoche, int semid, int *contador);
  * @file semaforos.c
  * @date 11/04/2016
  */
-int lightSwitchOn(int semid,int direccion,int *contador);
+int lightSwitchOn(int semid,int direccion, int *contador);
 
 /**
  * Funcion encargada de decrementar el contador del puente, y si
@@ -68,72 +78,43 @@ int lightSwitchOff(int semid,int direccion,int *contador);
  */
 int main(void){
 
-    int i,ret,ppid;
-    int semid,shmid;
-    int *datos;
+    int i;
+    int semid;
+    pthread_t hilo[NUM_COCHES];
+    datos data[NUM_COCHES];
+    int contador[2] = {0,0};
     unsigned short semaf[3] = {1,1,1};
 
-    ppid = getppid();
+    /* Semilla para numeros aleatorios */
+    srand(getpid());
+
     /* Creamos 3 semaforos, dos mutex para contadores y otro para el puente */
     if(Crear_Semaforo(SEMKEY, 3, &semid) == ERROR){
         perror("Error al crear los semaforos");
         exit(EXIT_FAILURE);
     }
-
+    /* Lo inicializamos */
     Inicializar_Semaforo(semid, semaf);
 
-    /* Creamos memoria compartida para 2 contadores */
-    if((shmid=shmget(SHMKEY, 2 * sizeof(int),IPC_CREAT | SHM_R | SHM_W)) == ERROR ){
-        perror("Error creando memoria compartida");
-        Borrar_Semaforo(semid);
-        exit(EXIT_FAILURE);
-    }   
-    /* Obtenemos la memoria compartida */
-    if((datos= (int*) shmat(shmid,(char*)0,0)) == NULL){
-        perror("Error obteniendo memoria compartida");
-        Borrar_Semaforo(semid);
-        exit(EXIT_FAILURE);
-    }
+    
 
-    /* Bucle para crear procesos */
+    /* Bucle para crear hilos*/
     for(i=0; i < NUM_COCHES; i++){
-        switch(fork()){
-            case -1: /* Caso de error */
-                perror("Error en el fork");
-
-                if(ppid == getpid()){ /* Padre espera hijos */               
-                    ret = 1;
-                    while(ret){
-                        ret = wait(NULL);
-                    }
-                    Borrar_Semaforo(semid); /* El padre borra el semaforo */
-                }
-                shmdt((char*)datos);
-                shmctl(shmid,IPC_RMID,(struct shmid_ds*)NULL);
-                exit(EXIT_FAILURE);
-
-            case 0: /* Caso del hijo */
-            /* Intercalamos direcciones */
-                if(cruzarPuente(i%2 ,i, semid, &datos[i%2]) == ERROR){
-                    shmdt((char*)datos);
-                    shmctl(shmid,IPC_RMID,(struct shmid_ds*)NULL);
-                    perror("Error al cruzar el puente");
-                    exit(EXIT_FAILURE);
-                }
-                shmdt((char*)datos);
-                shmctl(shmid,IPC_RMID,(struct shmid_ds*)NULL);
-                exit(EXIT_SUCCESS);
-        } 
+        
+        /* Inicializamos la estructura asociada al proceso */  
+        data[i].contador = &(contador[i%2]);
+        data[i].direccion = i%2;
+        data[i].semid = semid;
+        data[i].numCoche = i;
+        pthread_create(&(hilo[i]),NULL,(void * (*)(void *))cruzarPuente,&(data[i]));
+        
     }
-    /* Esperamos a todos los hijos */
+    /* Esperamos a todos los hilos */
     for(i=0; i < NUM_COCHES; i++){
-        wait(NULL);
+        pthread_join(hilo[i],NULL);
     }
 
-    /* Borramos semaforo y memoria compartida */
-    shmdt((char*)datos);
-    shmctl(shmid,IPC_RMID,(struct shmid_ds*)NULL);
-
+    /* Borramos los semaforos */
     if(Borrar_Semaforo(semid) == ERROR){
         perror("Error al borrar semaforos");
         exit(EXIT_FAILURE);
@@ -142,25 +123,23 @@ int main(void){
     exit(EXIT_SUCCESS);
 }
 
-int cruzarPuente(int direccion,int nCoche, int semid, int *contador){
+void *cruzarPuente(datos *d){
+    
     /* Esperamos para cruzar */
-    srand(getpid());
     sleep((rand() % T_ESPERA) + 1);
 
-    if(lightSwitchOn(semid,direccion,contador) == ERROR){
-        return ERROR;
-    }
+    /* Pasamos al puente */
+    lightSwitchOn(d->semid,d->direccion,d->contador);
 
     /* Cruzamos el puente */
-    printf("PID %d - Coche %3d cruzando direccion %s\n",getpid(),nCoche, (!direccion) ? "norte" : "sur");
+    printf("Coche %3d cruzando direccion %s\n",d->numCoche, (!d->direccion) ? "norte" : "sur");
     sleep(T_CRUZAR);
-    printf("PID %d - Coche %3d ha terminado direccion %s\n",getpid(),nCoche, (!direccion) ? "norte" : "sur");
+    printf("Coche %3d ha terminado direccion %s\n",d->numCoche, (!d->direccion) ? "norte" : "sur");
     
-    if(lightSwitchOff(semid,direccion,contador) == ERROR){
-        return ERROR;
-    }
-
-    return OK;
+    /* Salimos del puente */ 
+    lightSwitchOff(d->semid,d->direccion,d->contador);
+    
+    pthread_exit(NULL);
 }
 
 int lightSwitchOn(int semid,int direccion,int *contador){
