@@ -1,6 +1,6 @@
-CC = gcc -std=c99 -pedantic
+CC = gcc -pedantic
 CFLAGS = -w
-EXE = ejercicio6 ejercicio7
+EXE =  ejercicio2 ejercicio5 ejercicio6 ejercicio7
 LDFLAGS = -lpthread
 
 all : $(EXE)
@@ -15,7 +15,7 @@ clean :
 	rm -f *.o core $(EXE)
 
 $(EXE) : % : %.o semaforos.o
-	@echo "gcc -std=c99 -pedantic -w -c eres un inutil dedicate a otra cosa -lpthread"
+	@echo "gcc -std=c99 -pedantic -w -c -lpthread"
 	$(CC) $(CFLAGS) -o $@ $@.o semaforos.o $(LDFLAGS)
 
 %.o : %.c semaforos.h

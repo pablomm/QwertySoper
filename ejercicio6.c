@@ -2,7 +2,7 @@
  * Ejercicio 6 de la practica 3
  * Sistemas Operativos 
  * @brief Ejercicio 6
- * @file semaforos.c
+ * @file ejercicio6.c
  * @author Pablo Marcos Manchon pablo.marcosm@estudiante.uam.es
  * @author David Nevado Catalan david.nevadoc@estudiante.uam.es
  * @date 11/04/2016
@@ -24,7 +24,7 @@
 /**
  * @brief key para generar los semaforos
  */
-#define SEMKEY 75798
+#define SEMKEY 70001
 
 /**
  * @brief key para generar la memoria compartida
@@ -35,7 +35,7 @@
  * Funcion cruzar puente, se encarga de que el coche espere
  * y regula el paso al puente
  * @brief Funcion cruzar puente
- * @file semaforos.c
+ * @file ejercicio6.c
  * @date 11/04/2016
  */
 int cruzarPuente(int direccion,int nCoche, int semid, int *contador);
@@ -44,7 +44,7 @@ int cruzarPuente(int direccion,int nCoche, int semid, int *contador);
  * Funcion encargada de aumentar el contador del puente, y si
  * es el primer coche hace down del puente
  * @brief Regula entrada al puente
- * @file semaforos.c
+ * @file ejercicio6.c
  * @date 11/04/2016
  */
 int lightSwitchOn(int semid,int direccion,int *contador);
@@ -53,7 +53,7 @@ int lightSwitchOn(int semid,int direccion,int *contador);
  * Funcion encargada de decrementar el contador del puente, y si
  * es el ultimo coche hace up del puente
  * @brief Regula salida al puente
- * @file semaforos.c
+ * @file ejercicio6.c
  * @date 11/04/2016
  */
 int lightSwitchOff(int semid,int direccion,int *contador);
@@ -61,7 +61,7 @@ int lightSwitchOff(int semid,int direccion,int *contador);
 /**
  * Main ejercicio 6 
  * @brief Main ejercicio 6
- * @file semaforos.c
+ * @file ejercicio6.c
  * @author Pablo Marcos Manchon pablo.marcosm@estudiante.uam.es
  * @author David Nevado Catalan david.nevadoc@estudiante.uam.es
  * @date 11/04/2016
