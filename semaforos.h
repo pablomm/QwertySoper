@@ -8,6 +8,11 @@
  * @date 11/04/2016
  */
 
+/* Nota: se debe compilar en c99 o cambiar la
+ * reserva estatica de algunas funciones en funcion
+ * de size por una reserva dinamica
+*/
+
 #ifndef SEMAFOROS_H
 #define	SEMAFOROS_H
 
