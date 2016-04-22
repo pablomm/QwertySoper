@@ -152,7 +152,7 @@ int main(int argc,char *argv[]){
             printf("Proceso A - Abierto archivo '%s'\n\n",argv[1]);
 
             /* Leemos el archivo en bloques de hasta 4Kb */
-            while(fread(buffer,sizeof(char),MAX_LENGTH,fp) != 0){
+            while(fread(buffer,sizeof(char),MAX_LENGTH - 1,fp) != 0){
                 
                 if(flag == 0){ /* Caso primera lectura */
                     flag = 1;
