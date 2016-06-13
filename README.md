@@ -1,5 +1,5 @@
-# soper
-Prácticas asignatura Sistemas Operativos 2015/16(SOPER)
+# SOPER
+Prácticas Sistemas Operativos 2015/16 (SOPER)
 
 Prácticas a libre disposición de a quién le parezcan interesantes, o de algun alumno que quiera
 tomar un atajo en próximos años.
