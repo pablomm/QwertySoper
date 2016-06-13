@@ -8,6 +8,7 @@
  * @file cadena_montaje.c
  * @date 22/04/2016
  */
+#define _XOPEN_SOURCE 700
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -16,6 +17,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <ctype.h>
+
 
 /**
  * @brief Maxima longitud a leer
@@ -178,7 +183,10 @@ int main(int argc,char *argv[]){
                 msg.id = 1;
                 msg.valor = 0;
                 strcpy (msg.aviso, buffer);
-                printf("Proceso A - Enviando mensaje con texto: \n%s\n",msg.aviso);
+    
+                /* bzero(buffer,MAX_LENGTH*sizeof(char)); /* Deprecated */
+                memset(buffer,'\0', MAX_LENGTH*sizeof(char));
+                printf("Proceso A - Enviando mensaje con texto en minusculas\n");
                 /* Enviamos mensaje con id 1 */
                 msgsnd (msqid, (struct msgbuf *) &msg, sizeof(mensaje) - sizeof(long), 0);
             }
@@ -218,7 +226,7 @@ int main(int argc,char *argv[]){
                 msg.id = 2;
                 /* Convertimos a mayusculas el texto */ 
                 upper(msg.aviso); 
-                printf("Proceso B - Enviando mensaje con texto: \n%s\n",msg.aviso);
+                printf("Proceso B - Enviando mensaje con texto en mayusculas\n");
                 /* Enviamos mensaje con id 2 */
                 msgsnd (msqid, (struct msgbuf *) &msg, sizeof(mensaje) - sizeof(long), 0);
             }
